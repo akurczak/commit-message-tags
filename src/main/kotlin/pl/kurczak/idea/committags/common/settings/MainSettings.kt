@@ -3,6 +3,8 @@ package pl.kurczak.idea.committags.common.settings
 import com.intellij.openapi.components.PersistentStateComponent
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
+import com.intellij.openapi.components.service
+import com.intellij.openapi.project.Project
 import com.intellij.util.xmlb.annotations.XCollection
 import pl.kurczak.idea.committags.common.CommitTagServiceId
 
@@ -20,6 +22,13 @@ internal class MainSettings : PersistentStateComponent<MainSettingsState> {
     }
 }
 
-internal data class MainSettingsState(var tagPrefix: String = "[",
-                             var tagSuffix: String = "]",
-                             @XCollection(style = XCollection.Style.v2) var orderedCommitTagServices: List<CommitTagServiceId> = emptyList())
+internal val Project.mainSettings get() = service<MainSettings>().state
+
+internal data class MainSettingsState(
+    var tagPrefix: String = "[",
+    var tagSuffix: String = "]",
+    var enableAutomaticMessageUpdate: Boolean = true,
+    @XCollection(style = XCollection.Style.v2) var orderedCommitTagServices: List<CommitTagServiceId> = emptyList()
+) {
+    val tagRegex get() = "${Regex.escape(tagPrefix)}.*${Regex.escape(tagSuffix)}".toRegex()
+}

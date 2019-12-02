@@ -1,6 +1,5 @@
 package pl.kurczak.idea.committags.common.settings
 
-import com.intellij.openapi.components.service
 import com.intellij.openapi.options.BoundConfigurable
 import com.intellij.openapi.options.SearchableConfigurable
 import com.intellij.openapi.project.Project
@@ -15,7 +14,7 @@ internal class SettingsPanel(private val project: Project) :
 
     override fun createPanel(): DialogPanel {
 
-        val settings = project.service<MainSettings>().state
+        val settings = project.mainSettings
         return panel {
             titledRow("General") {
                 row("Module tag prefix:") {
@@ -28,6 +27,7 @@ internal class SettingsPanel(private val project: Project) :
                     taggersListView(project, settings::orderedCommitTagServices)
                 }
             }
+            titledRow("Tagger specific") {}
             row {
                 taggersTabbedView(project)
             }

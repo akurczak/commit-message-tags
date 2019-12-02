@@ -24,14 +24,29 @@
     </extensionPoints>
 
     <extensions defaultExtensionNs="com.intellij">
-        <projectConfigurable instance="pl.kurczak.idea.committags.common.settings.SettingsPanel" />
+        <projectConfigurable instance="pl.kurczak.idea.committags.common.settings.SettingsPanel"/>
         <projectService serviceImplementation="pl.kurczak.idea.committags.common.settings.MainSettings"/>
+        <checkinHandlerFactory implementation="pl.kurczak.idea.committags.common.CommitMessageCheckinHandlerFactory"/>
     </extensions>
 
     <extensions defaultExtensionNs="pl.kurczak.idea.committags">
     </extensions>
 
     <actions>
+        <action id="pl.kurczak.idea.committags.action.AddTagsAction"
+                class="pl.kurczak.idea.committags.action.AddTagsAction"
+                text="Add Tags"
+                description="Adds tags to commit message based on paths of modified files"
+                icon="TagIcons.ADD_TAGS">
+            <add-to-group group-id="Vcs.MessageActionGroup" anchor="first"/>
+        </action>
+        <action id="pl.kurczak.idea.committags.action.ToggleAutomaticTagAdditionAction"
+                class="pl.kurczak.idea.committags.action.ToggleAutomaticTagAdditionAction"
+                text="Add Tags Automatically"
+                description="Enables/disables automatic addition of tags to commit message"
+                icon="TagIcons.AUTO_ADD_TAGS">
+            <add-to-group group-id="Vcs.MessageActionGroup" anchor="first"/>
+        </action>
     </actions>
 
 </idea-plugin>

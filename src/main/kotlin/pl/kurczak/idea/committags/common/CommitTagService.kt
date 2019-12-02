@@ -3,6 +3,7 @@ package pl.kurczak.idea.committags.common
 import com.intellij.openapi.extensions.ExtensionPointName
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogPanel
+import com.intellij.openapi.vcs.changes.Change
 import kotlin.streams.toList
 
 internal val commitTagServiceExtensionPoint =
@@ -12,9 +13,10 @@ internal fun commitTagServices(project: Project) = commitTagServiceExtensionPoin
 
 internal fun commitTagServicesById(project: Project) = commitTagServices(project).associateBy { it.id }
 
-internal fun commitTagServices(project: Project, ids: List<CommitTagServiceId>) = commitTagServicesById(project).let { services ->
-    ids.mapNotNull { services[it] }
-}
+internal fun commitTagServices(project: Project, ids: List<CommitTagServiceId>) =
+    commitTagServicesById(project).let { services ->
+        ids.mapNotNull { services[it] }
+    }
 
 interface CommitTagService<out Creator : TagsCreator> {
 
@@ -22,16 +24,19 @@ interface CommitTagService<out Creator : TagsCreator> {
 
     val displayName: String
 
-    fun createSettingsPanel(): DialogPanel
+    fun createSettingsPanel(): DialogPanel?
 
-    fun createTagCreator(tagPrefix: String, tagSuffix: String): Creator
+    fun createTagCreator(): Creator
 }
 
-abstract class TagsCreator(private val tagPrefix: String, private val tagSuffix: String) {
+interface TagsCreator {
 
-    fun createTags() = createTagsContent().joinToString { "$tagPrefix$it$tagSuffix" }
-
-    protected abstract fun createTagsContent(): List<String>
+    fun createTagsContent(changes: List<Change>): List<String>
 }
+
+fun TagsCreator.createTags(tagPrefix: String, tagSuffix: String, changes: List<Change>) =
+    createTagsContent(changes).joinToString(separator = "") {
+        "$tagPrefix$it$tagSuffix"
+    }
 
 data class CommitTagServiceId(var id: String = "dummy")
