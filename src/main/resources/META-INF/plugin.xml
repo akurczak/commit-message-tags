@@ -1,5 +1,5 @@
 <idea-plugin>
-    <id>com.tomtom.nds.commitmessagetagsplugin</id>
+    <id>pl.kurczak.idea.committags</id>
     <name>Commit Message Tags</name>
     <vendor email="akurczakgh@gmail.com">Andrzej Kurczewski</vendor>
 
@@ -19,7 +19,16 @@
 
     <depends>com.intellij.modules.vcs</depends>
 
+    <extensionPoints>
+        <extensionPoint name="commitTagService" interface="pl.kurczak.idea.committags.common.CommitTagService" area="IDEA_PROJECT"/>
+    </extensionPoints>
+
     <extensions defaultExtensionNs="com.intellij">
+        <projectConfigurable instance="pl.kurczak.idea.committags.common.settings.SettingsPanel" />
+        <projectService serviceImplementation="pl.kurczak.idea.committags.common.settings.MainSettings"/>
+    </extensions>
+
+    <extensions defaultExtensionNs="pl.kurczak.idea.committags">
     </extensions>
 
     <actions>
