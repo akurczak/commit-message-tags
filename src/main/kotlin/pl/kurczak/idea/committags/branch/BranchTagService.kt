@@ -10,7 +10,7 @@ import pl.kurczak.idea.committags.branch.ui.branchTagPatternView
 import pl.kurczak.idea.committags.common.CommitTagService
 import pl.kurczak.idea.committags.common.CommitTagServiceId
 import pl.kurczak.idea.committags.common.settings.COMMIT_TAGS_SETTINGS_FILE
-import pl.kurczak.idea.committags.common.settings.MainSettings
+import pl.kurczak.idea.committags.common.settings.mainSettings
 
 internal class BranchTagService(project: Project) : CommitTagService<BranchTagCreator>(project) {
 
@@ -18,9 +18,9 @@ internal class BranchTagService(project: Project) : CommitTagService<BranchTagCr
 
     override val displayName = "Branch name"
 
-    private val branchSettings get() = project.service<BranchSettings>().state
+    private val branchSettings get() = project.branchSettings
 
-    private val mainSettings get() = project.service<MainSettings>().state
+    private val mainSettings get() = project.mainSettings
 
     override fun createSettingsPanel() = panel {
         row {
@@ -33,6 +33,8 @@ internal class BranchTagService(project: Project) : CommitTagService<BranchTagCr
         BranchTagPattern(branchSettings.branchNamePattern, branchSettings.branchTagTemplate)
     )
 }
+
+internal val Project.branchSettings get() = service<BranchSettings>().state
 
 @State(name = "BranchSettings", storages = [Storage(file = COMMIT_TAGS_SETTINGS_FILE)])
 internal class BranchSettings : PersistentStateComponent<BranchSettingsState> {

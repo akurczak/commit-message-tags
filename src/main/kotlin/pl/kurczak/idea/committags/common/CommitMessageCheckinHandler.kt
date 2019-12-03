@@ -1,10 +1,12 @@
 package pl.kurczak.idea.committags.common
 
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.Key
 import com.intellij.openapi.vcs.CheckinProjectPanel
 import com.intellij.openapi.vcs.changes.CommitContext
 import com.intellij.openapi.vcs.checkin.CheckinHandler
 import com.intellij.openapi.vcs.checkin.CheckinHandlerFactory
+import com.intellij.openapi.vcs.ui.RefreshableOnComponent
 import com.intellij.vcs.commit.AbstractCommitWorkflowHandler
 import com.intellij.vcs.commit.CommitWorkflowUi
 import pl.kurczak.idea.committags.common.settings.mainSettings
@@ -18,6 +20,8 @@ class CommitMessageCheckinHandlerFactory : CheckinHandlerFactory() {
     }
 }
 
+internal val commitWorkflowUiKey = Key.create<CommitWorkflowUi>("pl.kurczak.idea.committags.commitWorkflowUi")
+
 internal class CommitMessageCheckinHandler(
     private val project: Project,
     private val commitWorkflowUi: CommitWorkflowUi
@@ -25,7 +29,14 @@ internal class CommitMessageCheckinHandler(
 
     private val settings get() = project.mainSettings
 
+    override fun getBeforeCheckinConfigurationPanel(): RefreshableOnComponent? =
+        super.getBeforeCheckinConfigurationPanel().also {
+            project.putUserData(commitWorkflowUiKey, commitWorkflowUi)
+            includedChangesChanged()
+        }
+
     override fun includedChangesChanged() {
+
         if (settings.enableAutomaticMessageUpdate) {
             updateCommitMessage()
         }
@@ -34,23 +45,18 @@ internal class CommitMessageCheckinHandler(
     fun updateCommitMessage() {
         val commitMessageUi = commitWorkflowUi.commitMessageUi
         val currentMessage = commitMessageUi.text
-        val bareMessage = removeExistingTags(currentMessage).trim()
-        val newTags = project.commitTagServices(settings.orderedCommitTagServices).map {
+        val newTags = project.configuredCommitTagServices().map {
             it.createTagCreator()
-        }.joinToString(separator = "") {
-            it.createTags(settings.tagPrefix, settings.tagSuffix, commitWorkflowUi.getIncludedChanges())
+        }.flatMap {
+            it.createTagsContent(commitWorkflowUi.getIncludedChanges())
         }
-        val newMessage = if (bareMessage.endsWith(".")) {
-            "$newTags $bareMessage"
-        } else {
-            "$newTags $bareMessage."
-        }
-        if (newMessage != currentMessage) {
-            commitMessageUi.text = newMessage
-        }
+        updateCommitMessage(parseTaggedMessage(project, currentMessage).copy(tags = newTags))
     }
 
-    private fun removeExistingTags(currentMessage: String): String {
-        return settings.tagsRegex.replace(currentMessage, "")
+    fun updateCommitMessage(newMessage: TaggedMessage) {
+        val commitMessageUi = commitWorkflowUi.commitMessageUi
+        if (commitMessageUi.text != newMessage.fullMessageWithDot) {
+            commitMessageUi.text = newMessage.fullMessageWithDot
+        }
     }
 }

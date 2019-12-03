@@ -29,10 +29,4 @@ internal data class MainSettingsState(
     var tagSuffix: String = "]",
     var enableAutomaticMessageUpdate: Boolean = true,
     @XCollection(style = XCollection.Style.v2) var orderedCommitTagServices: List<CommitTagServiceId> = emptyList()
-) {
-    private val escapedPrefix = Regex.escape(tagPrefix)
-
-    private val escapedSuffix = Regex.escape(tagSuffix)
-
-    val tagsRegex get() = "^(${escapedPrefix}[^${escapedSuffix}]*${escapedSuffix})*".toRegex()
-}
+)

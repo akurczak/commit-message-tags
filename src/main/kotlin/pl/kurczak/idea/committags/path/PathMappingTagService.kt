@@ -18,7 +18,7 @@ internal class PathMappingTagService(project: Project) : CommitTagService<PathMa
 
     override val displayName = "Path mappings"
 
-    val settings get() = project.service<PathMappingSettings>().state
+    val settings get() = project.pathMappingSettings
 
     override fun createSettingsPanel() = panel {
         row("Display tags in local changes list:") {
@@ -31,6 +31,8 @@ internal class PathMappingTagService(project: Project) : CommitTagService<PathMa
 
     override fun createTagCreator() = PathMappingTagsCreator(settings.paths)
 }
+
+internal val Project.pathMappingSettings get() = service<PathMappingSettings>().state
 
 @State(name = "PathMappingSettings", storages = [Storage(file = COMMIT_TAGS_SETTINGS_FILE)])
 internal class PathMappingSettings : PersistentStateComponent<PathMappingSettingsState> {

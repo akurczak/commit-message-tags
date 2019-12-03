@@ -1,11 +1,10 @@
 package pl.kurczak.idea.committags.common
 
-import com.intellij.openapi.components.service
 import com.intellij.openapi.extensions.ExtensionPointName
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogPanel
 import com.intellij.openapi.vcs.changes.Change
-import pl.kurczak.idea.committags.common.settings.MainSettings
+import pl.kurczak.idea.committags.common.settings.mainSettings
 import kotlin.streams.asSequence
 import kotlin.streams.toList
 
@@ -24,6 +23,8 @@ internal fun Project.commitTagServices(ids: List<CommitTagServiceId>) =
         ids.mapNotNull { services[it] }
     }
 
+internal fun Project.configuredCommitTagServices() = commitTagServices(mainSettings.orderedCommitTagServices)
+
 abstract class CommitTagService<out Creator : TagsCreator>(protected val project: Project) {
 
     abstract val id: CommitTagServiceId
@@ -35,17 +36,12 @@ abstract class CommitTagService<out Creator : TagsCreator>(protected val project
     abstract fun createTagCreator(): Creator
 
     val enabled
-        get() = id in project.service<MainSettings>().state.orderedCommitTagServices
+        get() = id in project.mainSettings.orderedCommitTagServices
 }
 
 interface TagsCreator {
 
     fun createTagsContent(changes: List<Change>): List<String>
 }
-
-fun TagsCreator.createTags(tagPrefix: String, tagSuffix: String, changes: List<Change>) =
-    createTagsContent(changes).joinToString(separator = "") {
-        "$tagPrefix$it$tagSuffix"
-    }
 
 data class CommitTagServiceId(var id: String = "dummy")

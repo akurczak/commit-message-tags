@@ -20,7 +20,12 @@
     <depends>com.intellij.modules.vcs</depends>
 
     <extensionPoints>
-        <extensionPoint name="commitTagService" interface="pl.kurczak.idea.committags.common.CommitTagService" area="IDEA_PROJECT"/>
+        <extensionPoint name="commitTagService"
+                        interface="pl.kurczak.idea.committags.common.CommitTagService"
+                        area="IDEA_PROJECT"/>
+        <extensionPoint name="unknownTagQuickFixRegistrar"
+                        interface="pl.kurczak.idea.committags.common.UnknownTagQuickFixRegistrar"
+                        area="IDEA_PROJECT"/>
     </extensionPoints>
 
     <extensions defaultExtensionNs="com.intellij">
@@ -32,6 +37,8 @@
         <projectService serviceInterface="com.intellij.openapi.vcs.changes.ui.ChangesFileNameDecorator"
                         serviceImplementation="pl.kurczak.idea.committags.path.PathTagFileNameDecorator"
                         overrides="true"/>
+        <annotator language="TEXT"
+                   implementationClass="pl.kurczak.idea.committags.common.UnknownTagInCommitMessageAnnotator"/>
     </extensions>
 
     <extensions defaultExtensionNs="pl.kurczak.idea.committags">
