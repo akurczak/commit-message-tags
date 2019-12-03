@@ -27,11 +27,13 @@
         <projectConfigurable instance="pl.kurczak.idea.committags.common.settings.SettingsPanel"/>
         <projectService serviceImplementation="pl.kurczak.idea.committags.common.settings.MainSettings"/>
         <projectService serviceImplementation="pl.kurczak.idea.committags.branch.BranchSettings"/>
+        <projectService serviceImplementation="pl.kurczak.idea.committags.path.PathMappingSettings"/>
         <checkinHandlerFactory implementation="pl.kurczak.idea.committags.common.CommitMessageCheckinHandlerFactory"/>
     </extensions>
 
     <extensions defaultExtensionNs="pl.kurczak.idea.committags">
         <commitTagService implementation="pl.kurczak.idea.committags.branch.BranchTagService"/>
+        <commitTagService implementation="pl.kurczak.idea.committags.path.PathMappingTagService"/>
     </extensions>
 
     <actions>
