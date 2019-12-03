@@ -116,7 +116,7 @@ internal class PathMappingsTable(items: MutableList<PathMapping>) : JBTable() {
         override fun getColumnClass(columnIndex: Int) = String::class.java
 
         override fun getValueAt(rowIndex: Int, columnIndex: Int): Any? = when (columnIndex) {
-            0 -> items[rowIndex].pathPattern
+            0 -> items[rowIndex].pathPart
             1 -> items[rowIndex].tag
             else -> null
         }
@@ -140,8 +140,8 @@ private class EntryEditor(theTitle: String, val item: PathMapping = PathMapping(
         row("Path part") {
             cell {
                 textField(
-                    { item.pathPattern },
-                    { item.pathPattern = it },
+                    { item.pathPart },
+                    { item.pathPart = it },
                     40
                 ).withErrorOnApplyIf("Empty path part") { it.text.isBlank() }.focused()
             }

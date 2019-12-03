@@ -35,7 +35,7 @@ internal class CommitMessageCheckinHandler(
         val commitMessageUi = commitWorkflowUi.commitMessageUi
         val currentMessage = commitMessageUi.text
         val bareMessage = removeExistingTags(currentMessage).trim()
-        val newTags = commitTagServices(project, settings.orderedCommitTagServices).map {
+        val newTags = project.commitTagServices(settings.orderedCommitTagServices).map {
             it.createTagCreator()
         }.joinToString(separator = "") {
             it.createTags(settings.tagPrefix, settings.tagSuffix, commitWorkflowUi.getIncludedChanges())

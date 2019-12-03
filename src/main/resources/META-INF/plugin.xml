@@ -29,6 +29,9 @@
         <projectService serviceImplementation="pl.kurczak.idea.committags.branch.BranchSettings"/>
         <projectService serviceImplementation="pl.kurczak.idea.committags.path.PathMappingSettings"/>
         <checkinHandlerFactory implementation="pl.kurczak.idea.committags.common.CommitMessageCheckinHandlerFactory"/>
+        <projectService serviceInterface="com.intellij.openapi.vcs.changes.ui.ChangesFileNameDecorator"
+                        serviceImplementation="pl.kurczak.idea.committags.path.PathTagFileNameDecorator"
+                        overrides="true"/>
     </extensions>
 
     <extensions defaultExtensionNs="pl.kurczak.idea.committags">

@@ -15,7 +15,7 @@ import javax.swing.border.EmptyBorder
 
 internal class TaggersTabbedView(project: Project) {
 
-    private val services: Map<CommitTagServiceId, CommitTagService<*>> = commitTagServicesById(project)
+    private val services: Map<CommitTagServiceId, CommitTagService<*>> = project.commitTagServicesById()
 
     private val settingsPanels: Map<CommitTagServiceId, DialogPanel> = services.mapValues {
         it.value.createSettingsPanel()?.withBorder(EmptyBorder(10, 0, 10, 0))

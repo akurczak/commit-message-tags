@@ -42,7 +42,7 @@ internal class TaggersListView(private val project: Project) {
         unusedTaggers.isNotEmpty()
     }.createPanel()
 
-    private val unusedTaggers get() = commitTagServices(project) - model.items
+    private val unusedTaggers get() = project.commitTagServices() - model.items
 
     private fun addTagger(button: AnActionButton) {
         val actionGroup = DefaultActionGroup(null, false)
@@ -104,7 +104,7 @@ internal fun Row.taggersListView(
     val component = taggersListView.panelWithToolbar
     return component().withBinding(
         { taggersListView.model.items.map { it.id } },
-        { _, it -> taggersListView.model.replaceAll(commitTagServices(project, it)) },
+        { _, it -> taggersListView.model.replaceAll(project.commitTagServices(it)) },
         PropertyBinding(property::get, property::set)
     ).onApply {
         taggersListView.applyTaggersConfigurations()

@@ -12,15 +12,18 @@ import pl.kurczak.idea.committags.common.settings.COMMIT_TAGS_SETTINGS_FILE
 import pl.kurczak.idea.committags.path.ui.pathMappingsTable
 import javax.swing.DefaultComboBoxModel
 
-internal class PathMappingTagService(private val project: Project) : CommitTagService<PathMappingTagsCreator> {
+internal class PathMappingTagService(project: Project) : CommitTagService<PathMappingTagsCreator>(project) {
 
     override val id = CommitTagServiceId("PathMappingTagService")
 
     override val displayName = "Path mappings"
 
-    private val settings get() = project.service<PathMappingSettings>().state
+    val settings get() = project.service<PathMappingSettings>().state
 
     override fun createSettingsPanel() = panel {
+        row("Display tags in local changes list:") {
+            comboBox(DefaultComboBoxModel(PathTagsDisplay.values()), settings::pathTagsDisplay)
+        }
         row("Path mappings:") {
             pathMappingsTable(settings::paths)
         }
@@ -42,7 +45,19 @@ internal class PathMappingSettings : PersistentStateComponent<PathMappingSetting
 }
 
 internal data class PathMappingSettingsState(
-    var paths: List<PathMapping> = emptyList()
+    var paths: List<PathMapping> = emptyList(),
+    var pathTagsDisplay: PathTagsDisplay = PathTagsDisplay.ALL
 )
 
-internal data class PathMapping(var pathPattern: String = "", var tag: String = "")
+internal fun List<PathMapping>.findTag(path: String) = firstOrNull { it.pathPart in path }?.tag
+
+internal enum class PathTagsDisplay(private val displayName: String) {
+
+    ALL("Always"),
+    UNKNOWN_ONLY("For unknown tags only"),
+    NONE("Never");
+
+    override fun toString() = displayName
+}
+
+internal data class PathMapping(var pathPart: String = "", var tag: String = "")

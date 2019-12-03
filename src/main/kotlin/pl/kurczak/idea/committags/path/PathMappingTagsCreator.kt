@@ -9,7 +9,7 @@ internal class PathMappingTagsCreator(private val pathMappings: List<PathMapping
         .flatMap { sequenceOf(it.beforeRevision, it.afterRevision) }
         .distinct()
         .filterNotNull()
-        .mapNotNull { revision ->
-            pathMappings.find { it.pathPattern in revision.file.path }?.tag
+        .mapNotNull {
+            pathMappings.findTag(it.file.path)
         }.distinct().toList()
 }

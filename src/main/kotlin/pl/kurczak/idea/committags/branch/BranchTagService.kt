@@ -12,7 +12,7 @@ import pl.kurczak.idea.committags.common.CommitTagServiceId
 import pl.kurczak.idea.committags.common.settings.COMMIT_TAGS_SETTINGS_FILE
 import pl.kurczak.idea.committags.common.settings.MainSettings
 
-internal class BranchTagService(private val project: Project) : CommitTagService<BranchTagCreator> {
+internal class BranchTagService(project: Project) : CommitTagService<BranchTagCreator>(project) {
 
     override val id = CommitTagServiceId("BranchTagService")
 
