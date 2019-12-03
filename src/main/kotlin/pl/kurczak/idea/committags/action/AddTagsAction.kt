@@ -17,8 +17,12 @@ internal class AddTagsAction : AnAction(), DumbAware {
     }
 
     override fun update(e: AnActionEvent) {
-        val commitWorkflowHandler = e.getData(VcsDataKeys.COMMIT_WORKFLOW_HANDLER) ?: return
-        val ui = (commitWorkflowHandler as? AbstractCommitWorkflowHandler<*, *>)?.ui ?: return
-        e.presentation.isEnabled = !ui.getIncludedChanges().isNullOrEmpty()
+        e.presentation.isEnabled = shouldBeEnabled(e)
+    }
+
+    private fun shouldBeEnabled(e: AnActionEvent): Boolean {
+        val commitWorkflowHandler = e.getData(VcsDataKeys.COMMIT_WORKFLOW_HANDLER) ?: return false
+        val ui = (commitWorkflowHandler as? AbstractCommitWorkflowHandler<*, *>)?.ui ?: return false
+        return !ui.getIncludedChanges().isNullOrEmpty()
     }
 }
