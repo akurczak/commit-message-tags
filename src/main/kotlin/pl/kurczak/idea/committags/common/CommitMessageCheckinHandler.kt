@@ -51,6 +51,6 @@ internal class CommitMessageCheckinHandler(
     }
 
     private fun removeExistingTags(currentMessage: String): String {
-        return settings.tagRegex.replace(currentMessage, "")
+        return settings.tagsRegex.replace(currentMessage, "")
     }
 }
