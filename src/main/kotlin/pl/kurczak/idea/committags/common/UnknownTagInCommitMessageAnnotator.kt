@@ -16,52 +16,38 @@ internal val unknownTagQuickFixRegistrarExtensionPoint =
 
 internal fun Project.unknownTagQuickFixRegistrars() = unknownTagQuickFixRegistrarExtensionPoint.extensions(this).toList()
 
-internal class UnknownTagInCommitMessageAnnotator : Annotator {
+internal class UnknownTagInCommitMessageAnnotator : CommitMessageTagsAnnotator() {
 
-    private fun getTagsPositions(
-        tagPrefix: String,
-        tagSuffix: String,
-        tags: List<String>,
-        messageTextRange: TextRange
-    ): Map<String, TextRange> {
-        val additionalSize = tagPrefix.length + tagSuffix.length
-        var startOffset = messageTextRange.startOffset
-        val result = mutableMapOf<String, TextRange>()
-        for (tag in tags) {
-            val endOffset = startOffset + tag.length + additionalSize
-            result[tag] = TextRange(startOffset, endOffset)
-            startOffset = endOffset
-        }
-        return result
-    }
-
-    override fun annotate(element: PsiElement, holder: AnnotationHolder) {
-        if (!CommitMessage.isCommitMessage(element)) {
-            return
-        }
-        val project = element.project
+    override fun doAnnotate(
+        project: Project,
+        parsedMessage: TaggedMessage,
+        element: PsiElement,
+        holder: AnnotationHolder
+    ) {
         val workflowUi = project.getUserData(commitWorkflowUiKey) ?: return
-        val actualTags = parseTaggedMessage(project, element.text).tags
         val expectedTags = project.configuredCommitTagServices().map {
             it.createTagCreator()
         }.flatMap {
             it.createTagsContent(workflowUi.getIncludedChanges())
         }
+        val actualTags = parsedMessage.tags
         val unexpectedTags = actualTags - expectedTags
         if (unexpectedTags.isNotEmpty()) {
-            val settings = project.mainSettings
             val quickFixFactories = project.unknownTagQuickFixRegistrars()
-            val tagsPositions = getTagsPositions(settings.tagPrefix, settings.tagSuffix, actualTags, element.textRange)
+            val tagsPositions = getTagsPositions(project, actualTags, element.textRange)
             for (tag in unexpectedTags) {
-                val position = tagsPositions[tag] ?: error("Cannot retrieve tag position in message")
-                val annotation = holder.createErrorAnnotation(position, "Unknown tag")
-                annotation.registerFix(RemoveTagIntentionAction(position))
-                for (it in quickFixFactories) {
-                    it.registerQuickFix(tag, position, annotation)
+                val positions = tagsPositions[tag] ?: error("Cannot retrieve tag position in message")
+                for (position in positions) {
+                    val annotation = holder.createErrorAnnotation(position, "Unknown tag")
+                    annotation.registerFix(RemoveTagIntentionAction(position, "unknown"))
+                    for (it in quickFixFactories) {
+                        it.registerQuickFix(tag, position, annotation)
+                    }
                 }
             }
         }
     }
+
 }
 
 interface UnknownTagQuickFixRegistrar {

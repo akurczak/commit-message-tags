@@ -39,6 +39,7 @@
                         overrides="true"/>
         <annotator language="TEXT"
                    implementationClass="pl.kurczak.idea.committags.common.UnknownTagInCommitMessageAnnotator"/>
+        <annotator language="TEXT" implementationClass="pl.kurczak.idea.committags.common.DuplicatedTagsAnnotator"/>
     </extensions>
 
     <extensions defaultExtensionNs="pl.kurczak.idea.committags">

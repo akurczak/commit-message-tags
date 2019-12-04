@@ -4,7 +4,7 @@ import com.intellij.openapi.project.Project
 import pl.kurczak.idea.committags.common.settings.MainSettingsState
 import pl.kurczak.idea.committags.common.settings.mainSettings
 
-internal data class TaggedMessage(
+data class TaggedMessage(
     private val tagPrefix: String,
     private val tagSuffix: String,
     val bareMessage: String,
@@ -24,7 +24,7 @@ internal data class TaggedMessage(
 
 private val messageRegexCache = mutableMapOf<Pair<String, String>, Regex>()
 
-internal fun parseTaggedMessage(project: Project, message: String): TaggedMessage {
+fun parseTaggedMessage(project: Project, message: String): TaggedMessage {
 
     val settings = project.mainSettings
     val messageRegex = messageRegexCache.getOrPut(settings.tags) {
