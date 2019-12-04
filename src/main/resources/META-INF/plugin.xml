@@ -44,6 +44,8 @@
     <extensions defaultExtensionNs="pl.kurczak.idea.committags">
         <commitTagService implementation="pl.kurczak.idea.committags.branch.BranchTagService"/>
         <commitTagService implementation="pl.kurczak.idea.committags.path.PathMappingTagService"/>
+        <unknownTagQuickFixRegistrar
+                implementation="pl.kurczak.idea.committags.path.DefinePathMappingQuickFixRegistrar"/>
     </extensions>
 
     <actions>

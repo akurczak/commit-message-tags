@@ -129,7 +129,7 @@ internal class PathMappingsTable(items: MutableList<PathMapping>) : JBTable() {
     }
 }
 
-private class EntryEditor(theTitle: String, val item: PathMapping = PathMapping()) : DialogWrapper(true) {
+internal class EntryEditor(theTitle: String, val item: PathMapping = PathMapping()) : DialogWrapper(true) {
 
     init {
         title = theTitle

@@ -25,11 +25,11 @@ internal class PathMappingTagService(project: Project) : CommitTagService<PathMa
             comboBox(DefaultComboBoxModel(PathTagsDisplay.values()), settings::pathTagsDisplay)
         }
         row("Path mappings:") {
-            pathMappingsTable(settings::paths)
+            pathMappingsTable(settings::pathMappings)
         }
     }
 
-    override fun createTagCreator() = PathMappingTagsCreator(settings.paths)
+    override fun createTagCreator() = PathMappingTagsCreator(settings.pathMappings)
 }
 
 internal val Project.pathMappingSettings get() = service<PathMappingSettings>().state
@@ -47,7 +47,7 @@ internal class PathMappingSettings : PersistentStateComponent<PathMappingSetting
 }
 
 internal data class PathMappingSettingsState(
-    var paths: List<PathMapping> = emptyList(),
+    var pathMappings: List<PathMapping> = emptyList(),
     var pathTagsDisplay: PathTagsDisplay = PathTagsDisplay.ALL
 )
 

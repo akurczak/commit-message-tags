@@ -24,7 +24,7 @@ internal class PathTagFileNameDecorator(private val project: Project) : WolfChan
         }
         val pathMappingTagService = project.commitTagService<PathMappingTagService>()?.takeIf { it.enabled } ?: return
         val settings = pathMappingTagService.settings.takeIf { it.pathTagsDisplay != PathTagsDisplay.NONE } ?: return
-        val tag = settings.paths.findTag(vFile.path).toTag()
+        val tag = settings.pathMappings.findTag(vFile.path).toTag()
         renderer.appendTag(tag)
     }
 }

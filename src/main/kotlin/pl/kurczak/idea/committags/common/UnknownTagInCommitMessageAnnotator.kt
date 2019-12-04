@@ -55,8 +55,9 @@ internal class UnknownTagInCommitMessageAnnotator : Annotator {
             for (tag in unexpectedTags) {
                 val position = tagsPositions[tag] ?: error("Cannot retrieve tag position in message")
                 val annotation = holder.createErrorAnnotation(position, "Unknown tag")
+                annotation.registerFix(RemoveTagIntentionAction(position))
                 for (it in quickFixFactories) {
-                    it.registerQuickFix(tag, annotation)
+                    it.registerQuickFix(tag, position, annotation)
                 }
             }
         }
@@ -65,5 +66,5 @@ internal class UnknownTagInCommitMessageAnnotator : Annotator {
 
 interface UnknownTagQuickFixRegistrar {
 
-    fun registerQuickFix(tag: String, annotation: Annotation)
+    fun registerQuickFix(tag: String, textRange: TextRange, annotation: Annotation)
 }
