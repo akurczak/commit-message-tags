@@ -3,6 +3,7 @@ package pl.kurczak.idea.committags.common
 import com.intellij.lang.annotation.Annotation
 import com.intellij.lang.annotation.AnnotationHolder
 import com.intellij.lang.annotation.Annotator
+import com.intellij.lang.annotation.HighlightSeverity
 import com.intellij.openapi.extensions.ExtensionPointName
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.TextRange
@@ -34,12 +35,12 @@ internal class UnknownTagInCommitMessageAnnotator : CommitMessageTagsAnnotator()
         val unexpectedTags = actualTags - expectedTags
         if (unexpectedTags.isNotEmpty()) {
             val quickFixFactories = project.unknownTagQuickFixRegistrars()
-            val tagsPositions = getTagsPositions(project, actualTags, element.textRange)
+            val tagsPositions = getTagsPositions(project, actualTags, element.text, element.textOffset)
             for (tag in unexpectedTags) {
                 val positions = tagsPositions[tag] ?: error("Cannot retrieve tag position in message")
                 for (position in positions) {
-                    val annotation = holder.createErrorAnnotation(position, "Unknown tag")
-                    annotation.registerFix(RemoveTagIntentionAction(position, "unknown"))
+                    val annotation = holder.createAnnotation(HighlightSeverity.ERROR, position, "Unexpected tag", "Unexpected tag: $tag")
+                    annotation.registerFix(RemoveTagIntentionAction(position, "unexpected"))
                     for (it in quickFixFactories) {
                         it.registerQuickFix(tag, position, annotation)
                     }

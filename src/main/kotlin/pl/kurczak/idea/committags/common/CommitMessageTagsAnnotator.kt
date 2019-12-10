@@ -29,16 +29,20 @@ abstract class CommitMessageTagsAnnotator : Annotator {
     protected fun getTagsPositions(
         project: Project,
         tags: List<String>,
-        messageTextRange: TextRange
+        message: String,
+        startOffset: Int
     ): Map<String, List<TextRange>> {
         val settings = project.mainSettings
-        val additionalSize = settings.tagPrefix.length + settings.tagSuffix.length
-        var startOffset = messageTextRange.startOffset
+        val prefixLength = settings.tagPrefix.length
+        val suffixLength = settings.tagSuffix.length
+        var searchStartIndex = 0
         val result = mutableMapOf<String, MutableList<TextRange>>()
         for (tag in tags) {
-            val endOffset = startOffset + tag.length + additionalSize
-            result.getOrPut(tag) { mutableListOf() }.add(TextRange(startOffset, endOffset))
-            startOffset = endOffset
+            val tagValueStartIndex = message.indexOf(tag, searchStartIndex)
+            val tagStartIndex = tagValueStartIndex - prefixLength
+            val tagEndIndex = tagValueStartIndex + tag.length + suffixLength
+            result.getOrPut(tag) { mutableListOf() }.add(TextRange(tagStartIndex, tagEndIndex).shiftRight(startOffset))
+            searchStartIndex = tagEndIndex
         }
         return result
     }

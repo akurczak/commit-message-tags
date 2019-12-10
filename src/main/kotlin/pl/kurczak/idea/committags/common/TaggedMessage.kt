@@ -23,6 +23,7 @@ data class TaggedMessage(
 }
 
 private val messageRegexCache = mutableMapOf<Pair<String, String>, Regex>()
+private val splitRegexCache = mutableMapOf<Pair<String, String>, Regex>()
 
 fun parseTaggedMessage(project: Project, message: String): TaggedMessage {
 
@@ -30,21 +31,26 @@ fun parseTaggedMessage(project: Project, message: String): TaggedMessage {
     val messageRegex = messageRegexCache.getOrPut(settings.tags) {
         val escapedPrefix = Regex.escape(settings.tagPrefix)
         val escapedSuffix = Regex.escape(settings.tagSuffix)
-        "^(?<tags>(${escapedPrefix}[^${escapedSuffix}]*${escapedSuffix})*)(?<message>.*)$".toRegex()
+        """^(?<tags>(${escapedPrefix}[^${escapedSuffix}]*${escapedSuffix}[\n\r\s]*)*)(?<message>.*)$""".toRegex(RegexOption.DOT_MATCHES_ALL)
     }
     val groups = messageRegex.matchEntire(message)?.groups
     val tags = groups?.get("tags")?.value ?: ""
     val bareMessage = groups?.get("message")?.value?.trim() ?: ""
-    return TaggedMessage(settings.tagPrefix, settings.tagSuffix, bareMessage, splitTags(settings.tagPrefix, settings.tagSuffix, tags))
+    return TaggedMessage(settings.tagPrefix, settings.tagSuffix, bareMessage, splitTags(settings, tags))
 }
 
-private fun splitTags(tagPrefix: String, tagSuffix: String, tagsString: String): List<String> {
-    val tags = tagsString.split(tagSuffix + tagPrefix).toMutableList()
+private fun splitTags(settings: MainSettingsState, tagsString: String): List<String> {
+    val splitRegex = splitRegexCache.getOrPut(settings.tags) {
+        val escapedPrefix = Regex.escape(settings.tagPrefix)
+        val escapedSuffix = Regex.escape(settings.tagSuffix)
+        """$escapedSuffix[\n\r\s]*$escapedPrefix""".toRegex()
+    }
+    val tags = tagsString.split(splitRegex).map { it.trim() }.toMutableList()
     if (tags.size > 0) {
         tags[0] = tags[0].drop(1)
         tags[tags.lastIndex] = tags[tags.lastIndex].dropLast(1)
     }
-    return tags
+    return tags.filter { it.isNotEmpty() }
 }
 
 private val MainSettingsState.tags get() = tagPrefix to tagSuffix
